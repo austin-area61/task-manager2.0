@@ -1,68 +1,58 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function () {
   const taskInput = document.getElementById('task-input');
-  const addTaskButton = document.getElementById('add-task-button');
+  const addTaskBtn = document.getElementById('add-task-btn');
   const taskList = document.getElementById('task-list');
 
-  addTaskButton.addEventListener('click', addTask);
-  taskList.addEventListener('click', handleTaskClick);
-
-  function addTask() {
+  addTaskBtn.addEventListener('click', function () {
     const taskText = taskInput.value.trim();
     if (taskText !== '') {
-      const li = document.createElement('li');
-      li.innerHTML = `
-        <span>${taskText}</span>
-        <div>
-          <button class="complete-btn">Complete</button>
-          <button class="delete-btn">Delete</button>
-          <button class="edit-btn">Edit</button>
-        </div>
-      `;
-      taskList.appendChild(li);
+      addTask(taskText);
       taskInput.value = '';
     }
-  }
+  });
 
-  function handleTaskClick(event) {
-    if (event.target.classList.contains('complete-btn')) {
-      const task = event.target.closest('li');
-      task.classList.toggle('completed');
-    } else if (event.target.classList.contains('delete-btn')) {
-      const task = event.target.closest('li');
-      task.remove();
-    } else if (event.target.classList.contains('edit-btn')){
-      const task = event.target.closest('li');
-      editTask(task);
-    }
-  }
+  function addTask(taskText) {
+    const taskItem = document.createElement('li');
 
-  // Function to edit a task
-  function editTask(task) {
-    const taskTextElement = task.querySelector('span');
-    const currentText = taskTextElement.textContent;
-
-    // Create an input field pre-filled with the current task text
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.value = currentText;
-    taskTextElement.textContent = '';
-    taskTextElement.appendChild(input);
-
-    // Create a save button
-    const saveButton = document.createElement('button');
-    saveButton.textContent = 'Save';
-    saveButton.classList.add('save-btn');
-    task.querySelector('div').appendChild(saveButton);
-
-    // Handle saving the edited task
-    saveButton.addEventListener('click', () => {
-      const newText = input.value.trim();
-      if (newText !== '') {
-        taskTextElement.textContent = newText;
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.addEventListener('click', function () {
+      if (checkbox.checked) {
+        taskItem.classList.add('completed');
       } else {
-        taskTextElement.textContent = currentText; // Revert if the new text is empty
+        taskItem.classList.remove('completed');
       }
-      saveButton.remove();
     });
+
+    const taskTextElement = document.createElement('span');
+    taskTextElement.classList.add('task-text');
+    taskTextElement.textContent = taskText;
+
+    const taskButtons = document.createElement('div');
+    taskButtons.classList.add('task-buttons');
+
+    const editButton = document.createElement('button');
+    editButton.textContent = 'Edit';
+    editButton.addEventListener('click', function () {
+      const newTaskText = prompt('Edit task:', taskTextElement.textContent);
+      if (newTaskText) {
+        taskTextElement.textContent = newTaskText;
+      }
+    });
+
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = 'Delete';
+    deleteButton.addEventListener('click', function () {
+      taskList.removeChild(taskItem);
+    });
+
+    taskButtons.appendChild(editButton);
+    taskButtons.appendChild(deleteButton);
+
+    taskItem.appendChild(checkbox);
+    taskItem.appendChild(taskTextElement);
+    taskItem.appendChild(taskButtons);
+
+    taskList.appendChild(taskItem);
   }
 });
